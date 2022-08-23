@@ -4,9 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.khoahd7621.realworldapi.entities.User;
+import com.khoahd7621.realworldapi.exceptions.custom.CustomBadRequestException;
+import com.khoahd7621.realworldapi.models.CustomError;
+import com.khoahd7621.realworldapi.models.user.dto.UserDTOCreate;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOLoginRequest;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOResponse;
 import com.khoahd7621.realworldapi.models.user.mapper.UserMapper;
@@ -22,9 +26,11 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final JwtTokenUtil jwtTokenUtil;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Map<String, UserDTOResponse> authenticate(Map<String, UserDTOLoginRequest> userLoginRequestMap) {
+    public Map<String, UserDTOResponse> authenticate(Map<String, UserDTOLoginRequest> userLoginRequestMap)
+            throws CustomBadRequestException {
 
         UserDTOLoginRequest userDTOLoginRequest = userLoginRequestMap.get("user");
 
@@ -33,19 +39,34 @@ public class UserServiceImpl implements UserService {
         boolean isAuthen = false;
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            if (user.getPassword().equals(userDTOLoginRequest.getPassword())) {
+            if (passwordEncoder.matches(userDTOLoginRequest.getPassword(), user.getPassword())) {
                 isAuthen = true;
             }
         }
         if (!isAuthen) {
-            System.out.println("Email or password is incorrect!");
+            throw new CustomBadRequestException(CustomError.builder()
+                    .code("400").message("Email or password is incorrect!").build());
         }
 
-        Map<String, UserDTOResponse> wrapper = new HashMap<>();
-        UserDTOResponse userDTOResponse = UserMapper.toUserDTOResponse(userOptional.get());
-        userDTOResponse.setToken(jwtTokenUtil.generateToken(userOptional.get(), 24 * 60 * 60));
-        wrapper.put("user", userDTOResponse);
+        return buildDTOResponse(userOptional.get());
+    }
 
+    @Override
+    public Map<String, UserDTOResponse> registerUser(Map<String, UserDTOCreate> userRegisterRequestMap) {
+        UserDTOCreate userDTOCreate = userRegisterRequestMap.get("user");
+
+        User user = UserMapper.toUser(userDTOCreate);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user = userRepository.save(user);
+
+        return buildDTOResponse(user);
+    }
+
+    private Map<String, UserDTOResponse> buildDTOResponse(User user) {
+        Map<String, UserDTOResponse> wrapper = new HashMap<>();
+        UserDTOResponse userDTOResponse = UserMapper.toUserDTOResponse(user);
+        userDTOResponse.setToken(jwtTokenUtil.generateToken(user, 24 * 60 * 60));
+        wrapper.put("user", userDTOResponse);
         return wrapper;
     }
 
