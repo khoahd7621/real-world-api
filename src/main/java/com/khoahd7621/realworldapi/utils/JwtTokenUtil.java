@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.khoahd7621.realworldapi.entities.User;
@@ -15,7 +16,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JwtTokenUtil {
 
-    private String secret = "KHOA_DZ";
+    @Value("${JWT_SECRET_KEY}")
+    private String secret;
 
     public String generateToken(User user, long expiredDate) {
         Map<String, Object> claims = new HashMap<>();
