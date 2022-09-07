@@ -4,11 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.khoahd7621.realworldapi.entities.User;
 import com.khoahd7621.realworldapi.exceptions.custom.CustomBadRequestException;
+import com.khoahd7621.realworldapi.exceptions.custom.CustomNotFoundException;
 import com.khoahd7621.realworldapi.models.CustomError;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOCreate;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOLoginRequest;
@@ -68,6 +71,23 @@ public class UserServiceImpl implements UserService {
         userDTOResponse.setToken(jwtTokenUtil.generateToken(user, 24 * 60 * 60));
         wrapper.put("user", userDTOResponse);
         return wrapper;
+    }
+
+    @Override
+    public Map<String, UserDTOResponse> getCurrentUser() throws CustomNotFoundException {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            String email = ((UserDetails) principal).getUsername();
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                return buildDTOResponse(user);
+            }
+        }
+        throw new CustomNotFoundException(CustomError.builder()
+                .code("404")
+                .message("User does not exist")
+                .build());
     }
 
 }
