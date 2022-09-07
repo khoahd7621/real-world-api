@@ -13,6 +13,7 @@ import com.khoahd7621.realworldapi.entities.User;
 import com.khoahd7621.realworldapi.exceptions.custom.CustomBadRequestException;
 import com.khoahd7621.realworldapi.exceptions.custom.CustomNotFoundException;
 import com.khoahd7621.realworldapi.models.CustomError;
+import com.khoahd7621.realworldapi.models.profile.dto.ProfileDTOResponse;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOCreate;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOLoginRequest;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOResponse;
@@ -88,6 +89,27 @@ public class UserServiceImpl implements UserService {
                 .code("404")
                 .message("User does not exist")
                 .build());
+    }
+
+    @Override
+    public Map<String, ProfileDTOResponse> getProfile(String username) throws CustomNotFoundException {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isEmpty()) {
+            throw new CustomNotFoundException(CustomError.builder()
+                    .code("404").message("User does not exist").build());
+        }
+        return buildProfileDTOResponse(userOptional.get());
+    }
+
+    private Map<String, ProfileDTOResponse> buildProfileDTOResponse(User user) {
+        Map<String, ProfileDTOResponse> wrapper = new HashMap<>();
+        wrapper.put("profile", ProfileDTOResponse.builder()
+                .username(user.getUsername())
+                .bio(user.getBio())
+                .image(user.getImage())
+                .following(false) // Todo: handle later
+                .build());
+        return wrapper;
     }
 
 }

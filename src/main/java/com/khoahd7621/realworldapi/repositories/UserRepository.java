@@ -11,4 +11,6 @@ import com.khoahd7621.realworldapi.entities.User;
 public interface UserRepository extends JpaRepository<User, Integer> {
 
     public Optional<User> findByEmail(String email);
+
+    public Optional<User> findByUsername(String username);
 }

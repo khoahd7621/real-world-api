@@ -29,6 +29,7 @@ public class WebSecurityConfig {
         httpSecurity.csrf().disable().authorizeRequests()
                 .antMatchers("/api/users/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/users").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/profiles/**").permitAll()
                 .antMatchers("/api/**").authenticated()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
