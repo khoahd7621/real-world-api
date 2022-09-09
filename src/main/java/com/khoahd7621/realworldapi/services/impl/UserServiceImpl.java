@@ -3,6 +3,7 @@ package com.khoahd7621.realworldapi.services.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -76,14 +77,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Map<String, UserDTOResponse> getCurrentUser() throws CustomNotFoundException {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            String email = ((UserDetails) principal).getUsername();
-            Optional<User> userOptional = userRepository.findByEmail(email);
-            if (userOptional.isPresent()) {
-                User user = userOptional.get();
-                return buildDTOResponse(user);
-            }
+        User userLoggedIn = getUserLoggedIn();
+        if (userLoggedIn != null) {
+            return buildDTOResponse(userLoggedIn);
         }
         throw new CustomNotFoundException(CustomError.builder()
                 .code("404")
@@ -98,16 +94,44 @@ public class UserServiceImpl implements UserService {
             throw new CustomNotFoundException(CustomError.builder()
                     .code("404").message("User does not exist").build());
         }
-        return buildProfileDTOResponse(userOptional.get());
+        User user = userOptional.get();
+
+        User userLoggedIn = getUserLoggedIn();
+        boolean isFollowing = false;
+        // If user send request is logged in, we need to check that he/she has followed
+        // this user or not
+        if (userLoggedIn != null) {
+            Set<User> followers = user.getFollowers(); // Get all folowers of user that we get profile
+            for (User u : followers) {
+                if (u.getId() == userLoggedIn.getId()) {
+                    isFollowing = true;
+                    break;
+                }
+            }
+        }
+        return buildProfileDTOResponse(user, isFollowing);
     }
 
-    private Map<String, ProfileDTOResponse> buildProfileDTOResponse(User user) {
+    private User getUserLoggedIn() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            String email = ((UserDetails) principal).getUsername();
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                return user;
+            }
+        }
+        return null;
+    }
+
+    private Map<String, ProfileDTOResponse> buildProfileDTOResponse(User user, boolean isFollowing) {
         Map<String, ProfileDTOResponse> wrapper = new HashMap<>();
         wrapper.put("profile", ProfileDTOResponse.builder()
                 .username(user.getUsername())
                 .bio(user.getBio())
                 .image(user.getImage())
-                .following(false) // Todo: handle later
+                .following(isFollowing) // Todo: handle later
                 .build());
         return wrapper;
     }
