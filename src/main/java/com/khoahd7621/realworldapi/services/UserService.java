@@ -20,4 +20,6 @@ public interface UserService {
 
     public Map<String, ProfileDTOResponse> getProfile(String username) throws CustomNotFoundException;
 
+    public Map<String, ProfileDTOResponse> followUser(String username) throws CustomNotFoundException;
+
 }

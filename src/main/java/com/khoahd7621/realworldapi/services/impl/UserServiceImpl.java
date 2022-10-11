@@ -136,4 +136,34 @@ public class UserServiceImpl implements UserService {
         return wrapper;
     }
 
+    @Override
+    public Map<String, ProfileDTOResponse> followUser(String username) throws CustomNotFoundException {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isEmpty()) {
+            throw new CustomNotFoundException(CustomError.builder()
+                    .code("404").message("User does not exist").build());
+        }
+        User user = userOptional.get();
+        User userLoggedIn = getUserLoggedIn();
+        boolean isFollowing = false;
+        // If user send request is logged in, we need to check that he/she has followed
+        // this user or not
+        if (userLoggedIn != null) {
+            Set<User> followers = user.getFollowers(); // Get all folowers of user that we get profile
+            for (User u : followers) {
+                if (u.getId() == userLoggedIn.getId()) {
+                    isFollowing = true;
+                    break;
+                }
+            }
+        }
+        // We only perform the following operation if user logged in are not follow this user
+        if (!isFollowing) {
+            isFollowing = true;
+            user.getFollowers().add(userLoggedIn);
+            user = userRepository.save(user);
+        }
+        return buildProfileDTOResponse(user, isFollowing);
+    }
+
 }
