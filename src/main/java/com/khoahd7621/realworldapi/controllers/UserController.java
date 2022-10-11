@@ -8,6 +8,7 @@ import com.khoahd7621.realworldapi.exceptions.custom.CustomNotFoundException;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOCreate;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOLoginRequest;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOResponse;
+import com.khoahd7621.realworldapi.models.user.dto.UserDTOUpdateRequest;
 import com.khoahd7621.realworldapi.services.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Map;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
@@ -41,6 +43,11 @@ public class UserController {
     @GetMapping(value = "/user")
     public Map<String, UserDTOResponse> getCurrentUser() throws CustomNotFoundException {
         return userService.getCurrentUser();
+    }
+
+    @PutMapping(value = "/user")
+    public Map<String, UserDTOResponse> updateUser(@RequestBody Map<String, UserDTOUpdateRequest> userUpdateRequestMap) {
+        return userService.updateUser(userUpdateRequestMap);
     }
 
 }

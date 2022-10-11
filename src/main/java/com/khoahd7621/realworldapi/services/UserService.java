@@ -8,6 +8,7 @@ import com.khoahd7621.realworldapi.models.profile.dto.ProfileDTOResponse;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOCreate;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOLoginRequest;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOResponse;
+import com.khoahd7621.realworldapi.models.user.dto.UserDTOUpdateRequest;
 
 public interface UserService {
 
@@ -23,5 +24,7 @@ public interface UserService {
     public Map<String, ProfileDTOResponse> followUser(String username) throws CustomNotFoundException;
 
     public Map<String, ProfileDTOResponse> unFollowUser(String username) throws CustomNotFoundException;
+
+    public Map<String, UserDTOResponse> updateUser(Map<String, UserDTOUpdateRequest> userUpdateRequestMap);
 
 }

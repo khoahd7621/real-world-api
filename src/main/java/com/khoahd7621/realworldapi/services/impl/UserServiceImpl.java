@@ -18,6 +18,7 @@ import com.khoahd7621.realworldapi.models.profile.dto.ProfileDTOResponse;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOCreate;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOLoginRequest;
 import com.khoahd7621.realworldapi.models.user.dto.UserDTOResponse;
+import com.khoahd7621.realworldapi.models.user.dto.UserDTOUpdateRequest;
 import com.khoahd7621.realworldapi.models.user.mapper.UserMapper;
 import com.khoahd7621.realworldapi.repositories.UserRepository;
 import com.khoahd7621.realworldapi.services.UserService;
@@ -184,6 +185,17 @@ public class UserServiceImpl implements UserService {
             }
         }
         return buildProfileDTOResponse(user, false);
+    }
+
+    @Override
+    public Map<String, UserDTOResponse> updateUser(Map<String, UserDTOUpdateRequest> userUpdateRequestMap) {
+       UserDTOUpdateRequest userDTOUpdateRequest = userUpdateRequestMap.get("user");
+        User userLoggedIn = getUserLoggedIn();
+        userLoggedIn.setEmail(userDTOUpdateRequest.getEmail());
+        userLoggedIn.setBio(userDTOUpdateRequest.getBio());
+        userLoggedIn.setImage(userDTOUpdateRequest.getImage());
+        userRepository.save(userLoggedIn);
+        return buildDTOResponse(userLoggedIn);
     }
 
 }
