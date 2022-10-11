@@ -1,5 +1,6 @@
 package com.khoahd7621.realworldapi.entities;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -11,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -45,4 +47,7 @@ public class User {
 
     @ManyToMany(mappedBy = "followers")
     private Set<User> followings; // People that I have followed
+
+    @OneToMany(mappedBy = "author")
+    private List<Article> articles;
 }

@@ -113,7 +113,8 @@ public class UserServiceImpl implements UserService {
         return buildProfileDTOResponse(user, isFollowing);
     }
 
-    private User getUserLoggedIn() {
+    @Override
+    public User getUserLoggedIn() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
             String email = ((UserDetails) principal).getUsername();

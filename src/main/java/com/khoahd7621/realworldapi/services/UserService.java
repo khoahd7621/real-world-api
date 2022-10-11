@@ -2,6 +2,7 @@ package com.khoahd7621.realworldapi.services;
 
 import java.util.Map;
 
+import com.khoahd7621.realworldapi.entities.User;
 import com.khoahd7621.realworldapi.exceptions.custom.CustomBadRequestException;
 import com.khoahd7621.realworldapi.exceptions.custom.CustomNotFoundException;
 import com.khoahd7621.realworldapi.models.profile.dto.ProfileDTOResponse;
@@ -27,4 +28,5 @@ public interface UserService {
 
     public Map<String, UserDTOResponse> updateUser(Map<String, UserDTOUpdateRequest> userUpdateRequestMap);
 
+    public User getUserLoggedIn();
 }
