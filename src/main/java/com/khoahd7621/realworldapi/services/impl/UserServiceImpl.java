@@ -166,4 +166,24 @@ public class UserServiceImpl implements UserService {
         return buildProfileDTOResponse(user, isFollowing);
     }
 
+    @Override
+    public Map<String, ProfileDTOResponse> unFollowUser(String username) throws CustomNotFoundException {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isEmpty()) {
+            throw new CustomNotFoundException(CustomError.builder()
+                    .code("404").message("User does not exist").build());
+        }
+        User user = userOptional.get();
+        User userLoggedIn = getUserLoggedIn();
+        Set<User> followers = user.getFollowers(); // Get all folowers of user that we get profile
+        for (User u : followers) {
+            if (u.getId() == userLoggedIn.getId()) {
+                user.getFollowers().remove(u);
+                user = userRepository.save(user);
+                break;
+            }
+        }
+        return buildProfileDTOResponse(user, false);
+    }
+
 }

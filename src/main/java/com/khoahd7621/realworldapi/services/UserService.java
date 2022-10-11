@@ -22,4 +22,6 @@ public interface UserService {
 
     public Map<String, ProfileDTOResponse> followUser(String username) throws CustomNotFoundException;
 
+    public Map<String, ProfileDTOResponse> unFollowUser(String username) throws CustomNotFoundException;
+
 }

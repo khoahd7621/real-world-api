@@ -2,6 +2,7 @@ package com.khoahd7621.realworldapi.controllers;
 
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,11 @@ public class ProfileController {
     @PostMapping(value = "/{username}/follow")
     public Map<String, ProfileDTOResponse> followUser(@PathVariable String username) throws CustomNotFoundException {
         return userService.followUser(username);
+    }
+
+    @DeleteMapping(value = "/{username}/follow")
+    public Map<String, ProfileDTOResponse> unFollowUser(@PathVariable String username) throws CustomNotFoundException {
+        return userService.unFollowUser(username);
     }
 
 }
