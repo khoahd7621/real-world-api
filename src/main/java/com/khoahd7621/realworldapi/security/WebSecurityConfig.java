@@ -30,6 +30,7 @@ public class WebSecurityConfig {
                 .antMatchers("/api/users/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/users").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/profiles/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/articles/**").permitAll()
                 .antMatchers("/api/**").authenticated()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 

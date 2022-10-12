@@ -8,5 +8,7 @@ import com.khoahd7621.realworldapi.models.article.dto.ArticleDTOResponse;
 public interface ArticleService {
 
     public Map<String, ArticleDTOResponse> createArtile(Map<String, ArticleDTOCreateRequest> articleDTOCreateMap);
+
+    public Map<String, ArticleDTOResponse> getArticleBySlug(String slug);
     
 }

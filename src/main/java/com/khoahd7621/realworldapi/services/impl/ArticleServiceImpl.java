@@ -2,6 +2,7 @@ package com.khoahd7621.realworldapi.services.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,36 @@ public class ArticleServiceImpl implements ArticleService {
 
         Map<String, ArticleDTOResponse> wrapper = new HashMap<>();
         ArticleDTOResponse articleDTOResponse = ArticleMapper.toArticleDTOResponse(article, false, 0, false);
+        wrapper.put("article", articleDTOResponse);
+        return wrapper;
+    }
+
+    @Override
+    public Map<String, ArticleDTOResponse> getArticleBySlug(String slug) {
+        Article article = articleRepository.findBySlug(slug);
+
+        boolean favorited = false;
+        int favoritesCount = 0;
+        boolean isFollowing = false;
+        User userLoggedIn = userService.getUserLoggedIn();
+        if (userLoggedIn != null) {
+            // Todo: Check favorited or not
+
+            // Todo: Check favorites count
+        
+            // Check logged in user followed author of this article or not
+            User author = article.getAuthor();
+            Set<User> followers = author.getFollowers(); // Get all folowers of author
+            for (User u : followers) {
+                if (u.getId() == userLoggedIn.getId()) {
+                    isFollowing = true;
+                    break;
+                }
+            }
+        }
+        
+        ArticleDTOResponse articleDTOResponse = ArticleMapper.toArticleDTOResponse(article, favorited, favoritesCount, isFollowing);
+        Map<String, ArticleDTOResponse> wrapper = new HashMap<>();
         wrapper.put("article", articleDTOResponse);
         return wrapper;
     }
